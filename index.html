@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автомобильная галерея</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #e94560;
+            text-shadow: 0 2px 10px rgba(233, 69, 96, 0.5);
+        }
+
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background: rgba(30, 30, 50, 0.7);
+            padding: 20px 0;
+        }
+
+        .gallery-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            padding: 0 10px;
+        }
+
+        .slide {
+            flex: 0 0 calc(100% / 3);
+            padding: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                flex: 0 0 100%;
+            }
+        }
+
+        .card {
+            background: #0f3460;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .car-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 3px solid #e94560;
+        }
+
+        .car-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .car-name {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #e94560;
+        }
+
+        .car-description {
+            font-size: 0.9rem;
+            color: #b8c1ec;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .car-specs {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .spec {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spec-value {
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .spec-label {
+            font-size: 0.8rem;
+            color: #b8c1ec;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .arrow {
+            background: #e94560;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .arrow:hover {
+            background: #ff6b81;
+            transform: scale(1.1);
+        }
+
+        .arrow:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .pager {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 52, 96, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .pager-info {
+            margin: 0 15px;
+            font-size: 1.1rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .pager-dots {
+            display: flex;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #555;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #e94560;
+            transform: scale(1.2);
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #b8c1ec;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Галерея автомобилей</h1>
+        
+        <div class="gallery-container">
+            <div class="gallery-track" id="galleryTrack">
+                <!-- Слайды будут добавлены через JavaScript -->
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button class="arrow" id="prevBtn" disabled>‹</button>
+            
+            <div class="pager">
+                <div class="pager-dots" id="pagerDots">
+                    <!-- Точки пейджера будут добавлены через JavaScript -->
+                </div>
+                <div class="pager-info" id="pagerInfo">1 / 3</div>
+            </div>
+            
+            <button class="arrow" id="nextBtn">›</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        © 2025 Автомобильная галерея. Все права защищены.
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Данные автомобилей
+            const cars = [
+                {
+                    id: 1,
+                    name: "Porsche 911 Turbo",
+                    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Легендарный спортивный автомобиль с задним расположением двигателя и непревзойдёнными динамическими характеристиками.",
+                    specs: {
+                        power: "580 л.с.",
+                        acceleration: "2.8 сек",
+                        topSpeed: "320 км/ч"
+                    }
+                },
+                {
+                    id: 2,
+                    name: "Mercedes-Benz S-Class",
+                    image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Флагманский седан, сочетающий в себе роскошь, инновационные технологии и высочайший уровень комфорта.",
+                    specs: {
+                        power: "435 л.с.",
+                        acceleration: "4.9 сек",
+                        topSpeed: "250 км/ч"
+                    }
+                },
+                {
+                    id: 3,
+                    name: "BMW M5 Competition",
+                    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Высокопроизводительный седан с полным приводом и фирменной управляемостью BMW M.",
+                    specs: {
+                        power: "625 л.с.",
+                        acceleration: "3.3 сек",
+                        topSpeed: "305 км/ч"
+                    }
+                },
+                {
+                    id: 4,
+                    name: "Audi RS e-tron GT",
+                    image: "https://images.unsplash.com/photo-1593941707882-a5bba5331f26?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Электрический гран туризмо с футуристичным дизайном и молниеносным ускорением.",
+                    specs: {
+                        power: "637 л.с.",
+                        acceleration: "3.3 сек",
+                        topSpeed: "250 км/ч"
+                    }
+                },
+                {
+                    id: 5,
+                    name: "Lamborghini Huracán",
+                    image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Среднемоторный суперкар с атмосферным V10, предлагающий незабываемые эмоции от вождения.",
+                    specs: {
+                        power: "640 л.с.",
+                        acceleration: "2.9 сек",
+                        topSpeed: "325 км/ч"
+                    }
+                },
+                {
+                    id: 6,
+                    name: "Tesla Model S Plaid",
+                    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Электрический седан с рекордной динамикой, автопилотом и минималистичным интерьером.",
+                    specs: {
+                        power: "1020 л.с.",
+                        acceleration: "2.1 сек",
+                        topSpeed: "322 км/ч"
+                    }
+                },
+                {
+                    id: 7,
+                    name: "Jaguar F-Type",
+                    image: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Британский спортивный автомобиль с элегантным дизайном и характерным звуком выхлопа.",
+                    specs: {
+                        power: "575 л.с.",
+                        acceleration: "3.7 сек",
+                        topSpeed: "300 км/ч"
+                    }
+                },
+                {
+                    id: 8,
+                    name: "Ford Mustang Shelby GT500",
+                    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    description: "Американский мускулкар с компрессорным V8, наследник легендарных моделей Shelby.",
+                    specs: {
+                        power: "760 л.с.",
+                        acceleration: "3.3 сек",
+                        topSpeed: "290 км/ч"
+                    }
+                }
+            ];
+
+            const galleryTrack = document.getElementById('galleryTrack');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pagerDots = document.getElementById('pagerDots');
+            const pagerInfo = document.getElementById('pagerInfo');
+            
+            let currentPage = 0;
+            let slidesPerView = 3;
+            let itemsPerPage = 3; // По умолчанию листаем по 3 изображения
+            
+            // Определяем количество слайдов для мобильных устройств
+            function updateSlidesPerView() {
+                const oldSlidesPerView = slidesPerView;
+                const oldItemsPerPage = itemsPerPage;
+                
+                if (window.innerWidth <= 768) {
+                    slidesPerView = 1;
+                    itemsPerPage = 1; // На мобильных листаем по 1 изображению
+                } else {
+                    slidesPerView = 3;
+                    itemsPerPage = 3; // На компьютере листаем по 3 изображения
+                }
+                
+                // Пересчитываем текущую страницу при изменении размера экрана
+                if (oldSlidesPerView !== slidesPerView) {
+                    // Сохраняем позицию первого видимого элемента
+                    const firstVisibleItem = currentPage * oldItemsPerPage;
+                    currentPage = Math.floor(firstVisibleItem / itemsPerPage);
+                    
+                    // Ограничиваем текущую страницу максимальным значением
+                    const totalPages = Math.ceil(cars.length / itemsPerPage);
+                    currentPage = Math.min(currentPage, totalPages - 1);
+                }
+                
+                createPagerDots();
+                updateGallery();
+            }
+            
+            // Создаем слайды
+            function createSlides() {
+                galleryTrack.innerHTML = '';
+                
+                cars.forEach(car => {
+                    const slide = document.createElement('div');
+                    slide.className = 'slide';
+                    
+                    slide.innerHTML = `
+                        <div class="card">
+                            <img src="${car.image}" alt="${car.name}" class="car-image">
+                            <div class="car-info">
+                                <h3 class="car-name">${car.name}</h3>
+                                <p class="car-description">${car.description}</p>
+                                <div class="car-specs">
+                                    <div class="spec">
+                                        <span class="spec-value">${car.specs.power}</span>
+                                        <span class="spec-label">Мощность</span>
+                                    </div>
+                                    <div class="spec">
+                                        <span class="spec-value">${car.specs.acceleration}</span>
+                                        <span class="spec-label">0-100 км/ч</span>
+                                    </div>
+                                    <div class="spec">
+                                        <span class="spec-value">${car.specs.topSpeed}</span>
+                                        <span class="spec-label">Макс. скорость</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    galleryTrack.appendChild(slide);
+                });
+            }
+            
+            // Создаем точки пейджера
+            function createPagerDots() {
+                pagerDots.innerHTML = '';
+                const totalPages = Math.ceil(cars.length / itemsPerPage);
+                
+                for (let i = 0; i < totalPages; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = i === currentPage ? 'dot active' : 'dot';
+                    dot.addEventListener('click', () => {
+                        goToPage(i);
+                    });
+                    pagerDots.appendChild(dot);
+                }
+            }
+            
+            // Обновляем галерею
+            function updateGallery() {
+                const slideWidth = 100 / slidesPerView;
+                const translateX = -currentPage * (itemsPerPage / slidesPerView) * 100;
+                galleryTrack.style.transform = `translateX(${translateX}%)`;
+                
+                const totalPages = Math.ceil(cars.length / itemsPerPage);
+                
+                // Обновляем состояние кнопок
+                prevBtn.disabled = currentPage === 0;
+                nextBtn.disabled = currentPage >= totalPages - 1;
+                
+                // Обновляем пейджер
+                updatePager();
+            }
+            
+            // Обновляем пейджер
+            function updatePager() {
+                const totalPages = Math.ceil(cars.length / itemsPerPage);
+                pagerInfo.textContent = `${currentPage + 1} / ${totalPages}`;
+                
+                // Обновляем активную точку
+                const dots = document.querySelectorAll('.dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentPage);
+                });
+            }
+            
+            // Переход к определенной странице
+            function goToPage(pageIndex) {
+                currentPage = pageIndex;
+                updateGallery();
+            }
+            
+            // Переход к следующей странице
+            function nextPage() {
+                const totalPages = Math.ceil(cars.length / itemsPerPage);
+                if (currentPage < totalPages - 1) {
+                    currentPage++;
+                    updateGallery();
+                }
+            }
+            
+            // Переход к предыдущей странице
+            function prevPage() {
+                if (currentPage > 0) {
+                    currentPage--;
+                    updateGallery();
+                }
+            }
+            
+            // Инициализация
+            function init() {
+                createSlides();
+                updateSlidesPerView();
+                
+                // Обработчики событий
+                prevBtn.addEventListener('click', prevPage);
+                nextBtn.addEventListener('click', nextPage);
+                
+                // Обработчик изменения размера окна
+                window.addEventListener('resize', updateSlidesPerView);
+                
+                // Добавляем обработчики свайпа для мобильных устройств
+                let startX = 0;
+                let endX = 0;
+                
+                galleryTrack.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                });
+                
+                galleryTrack.addEventListener('touchend', (e) => {
+                    endX = e.changedTouches[0].clientX;
+                    handleSwipe();
+                });
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    const diff = startX - endX;
+                    
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            // Свайп влево - следующая страница
+                            nextPage();
+                        } else {
+                            // Свайп вправо - предыдущая страница
+                            prevPage();
+                        }
+                    }
+                }
+            }
+            
+            // Запускаем инициализацию
+            init();
+        });
+    </script>
+</body>
+</html>
